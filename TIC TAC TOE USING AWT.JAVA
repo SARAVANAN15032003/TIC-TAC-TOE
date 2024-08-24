@@ -1,29 +1,27 @@
+import javax.swing.*;
 import java.awt.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class XO extends Frame {
-    char c = 'X';
-    Button[] buttons = new Button[9];
-    boolean gameOver = false;
+public class XO extends JFrame {
+    char c = 'X'; // Variable to track the current player's symbol
+    JButton[] buttons = new JButton[9]; // Array to hold the buttons
+    boolean gameOver = false; // Flag to track if the game is over
 
     XO() {
-        Frame f = new Frame();
+        // Initialize JFrame
+        setTitle("Tic-Tac-Toe");
+        setSize(450, 450);
+        setLayout(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Initialize buttons
         for (int i = 0; i < 9; i++) {
-            buttons[i] = new Button();
-            f.add(buttons[i]);
+            buttons[i] = new JButton();
+            add(buttons[i]);
         }
-TextField t=new TextField();
-        // Set frame properties
-        f.setVisible(true);
-        f.setLayout(null);
-        f.setSize(450, 450);
-        f.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
-                f.dispose();
-            }
-        });
-f.add(t);
+
+        // Set button positions
         buttons[0].setBounds(100, 100, 100, 100);
         buttons[1].setBounds(200, 100, 100, 100);
         buttons[2].setBounds(300, 100, 100, 100);
@@ -33,45 +31,50 @@ f.add(t);
         buttons[6].setBounds(100, 300, 100, 100);
         buttons[7].setBounds(200, 300, 100, 100);
         buttons[8].setBounds(300, 300, 100, 100);
-t.setBounds(100,400,150,30);
-      
+
+        // Create ActionListener for buttons
         ActionListener action = new ActionListener() {
             public void actionPerformed(ActionEvent a) {
-                if (gameOver) return;
+                if (gameOver) return; // If the game is over, ignore further clicks
 
-                Button clickedButton = (Button) a.getSource();
-                clickedButton.setLabel(c + "");
-                clickedButton.setEnabled(false);
+                JButton clickedButton = (JButton) a.getSource();
+                clickedButton.setText(c + ""); // Set the button's text to the current player's symbol
+                clickedButton.setEnabled(false); // Disable the button to prevent further clicks
 
                 if (checkWin()) {
-                    System.out.println("Player " + c + " wins!");
-                    t.setText("Player " + (c+"") + " wins!");
-                    gameOver = true;
-                    disableAllButtons();
+                    JOptionPane.showMessageDialog(null, "Player " + c + " wins!");
+                    gameOver = true; // Set the gameOver flag to true
+                    disableAllButtons(); // Disable all buttons
                 } else if (checkDraw()) {
-                    System.out.println("It's a draw!");
-                    t.setText("It's a draw");
-                    gameOver = true;
+                    JOptionPane.showMessageDialog(null, "It's a draw!");
+                    gameOver = true; // Set the gameOver flag to true
                 } else {
-                    c = (c == 'X') ? 'O' : 'X';  // Toggle between X and O
+                    c = (c == 'X') ? 'O' : 'X'; // Toggle between 'X' and 'O'
                 }
             }
         };
-        for (Button button : buttons) {
+
+        // Add ActionListener to each button
+        for (JButton button : buttons) {
             button.addActionListener(action);
         }
+
+        setVisible(true); // Make the frame visible
     }
 
+    // Check if there is a winner
     boolean checkWin() {
-       int[][] winningCombos = {
+        // Winning combinations
+        int[][] winningCombos = {
             {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  // Rows
             {0, 3, 6}, {1, 4, 7}, {2, 5, 8},  // Columns
             {0, 4, 8}, {2, 4, 6}              // Diagonals
         };
 
         for (int[] combo : winningCombos) {
- if (buttons[combo[0]].getLabel().equals(c + "")&&buttons[combo[1]].getLabel().equals(c + "") &&
-                buttons[combo[2]].getLabel().equals(c + "")) {
+            if (buttons[combo[0]].getText().equals(c + "") &&
+                buttons[combo[1]].getText().equals(c + "") &&
+                buttons[combo[2]].getText().equals(c + "")) {
                 return true;
             }
         }
@@ -80,8 +83,8 @@ t.setBounds(100,400,150,30);
 
     // Check if it's a draw
     boolean checkDraw() {
-        for (Button button : buttons) {
-            if (button.getLabel().equals("")) {
+        for (JButton button : buttons) {
+            if (button.getText().equals("")) {
                 return false;  // If there is at least one empty button, it's not a draw
             }
         }
@@ -90,12 +93,13 @@ t.setBounds(100,400,150,30);
 
     // Disable all buttons after game ends
     void disableAllButtons() {
-        for (Button button : buttons) {
+        for (JButton button : buttons) {
             button.setEnabled(false);
         }
     }
 
     public static void main(String[] args) {
-        new XO();
+        // Ensure Swing components are created on the Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> new XO());
     }
 }
